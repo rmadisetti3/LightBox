@@ -5,32 +5,18 @@
  * Compiler:  Arduino AVR (Proteus)
  */
 
-// Peripheral Configuration Code (do not edit)
-//---CONFIG_BEGIN---
-#pragma GCC push_options
-#pragma GCC optimize ("Os")
+#include <Servo.h>
 
-#include <core.h> // Required by cpu
-#include <cpu.h>
-
-#pragma GCC pop_options
-
-// Peripheral Constructors
-CPU &cpu = Cpu;
-
-void peripheral_setup () {
-}
-
-void peripheral_loop() {
-}
-//---CONFIG_END---
+#include <SPI.h>
 
 bool toggle;
 bool toggle2;
 
+Servo servo;
+Servo servo2;
+
 void setup () {
-   peripheral_setup();
-   
+
    // Using Timer/Counter3 for timer interrupt
    // Disable interrupts
    
@@ -59,24 +45,25 @@ void setup () {
    TIMSK3 |= 0x02;
    // Enable interrupts
    sei();
-   
-   cpu.analogWrite(9,127);
-   cpu.analogWrite(6,127);
 
-}
+   servo.attach(6);
+   servo2.attach(9);
 
-// Interrupt Service routine for Timer3 Compare Match A 
-ISR(TIMER3_COMPA_vect){
-   toggle = !toggle;
-   cpu.setBuiltInLED(toggle);
+   servo.write(90);
+   servo2.write(90);
+
+   pinMode(LED_BUILTIN, OUTPUT);
+   pinMode(8, OUTPUT);
+
 }
 
 void loop() {
-   peripheral_loop();
-   // the built in LED should flash once a second
-   toggle2 = !toggle2;
-   cpu.digitalWrite(8,toggle2);
+  toggle2 = !toggle2;
+  digitalWrite(8, toggle2);
+  delay(1000);
+}
 
-   delay(1000);
-
+ISR(TIMER3_COMPA_vect){
+   toggle = !toggle;
+   digitalWrite(LED_BUILTIN, toggle);
 }
