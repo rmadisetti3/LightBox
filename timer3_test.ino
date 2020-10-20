@@ -2,35 +2,18 @@
  * Description: This program uses the 16-bit Timer3
  * as an interrupt to flash the built in LED at 1Hz
  *
- * Created:   Sat Oct 17 2020
- * Processor: Arduino Leonardo
- * Compiler:  Arduino AVR (Proteus)
+
+ * Created:    Sat Oct 20, 2020
+ * Author:     Kenneth Adam Barnett
+ * Board:      Arduino Pro Micro (ATMEGA32U4)
+ * 
  */
 
-// Peripheral Configuration Code (do not edit)
-//---CONFIG_BEGIN---
-#pragma GCC push_options
-#pragma GCC optimize ("Os")
-
-#include <core.h> // Required by cpu
-#include <cpu.h>
-
-#pragma GCC pop_options
-
-// Peripheral Constructors
-CPU &cpu = Cpu;
-
-void peripheral_setup () {
-}
-
-void peripheral_loop() {
-}
-//---CONFIG_END---
-
+// Global variables
 bool toggle;
 
-void setup () {
-   peripheral_setup();
+void setup() {
+
    // Using Timer/Counter3 for timer interrupt
    // Disable interrupts
    cli();
@@ -58,6 +41,8 @@ void setup () {
    TIMSK3 |= 0x02;
    // Enable interrupts
    sei();
+   
+   pinMode(LED_BUILTIN, OUTPUT);
 }
 
 // Interrupt Service routine for Timer3 Compare Match A 
@@ -66,8 +51,6 @@ ISR(TIMER3_COMPA_vect){
 }
 
 void loop() {
-   peripheral_loop();
-   // the built in LED should flash once a second
-   cpu.setBuiltInLED(toggle);
+  digitalWrite(LED_BUILTIN, toggle);
 
 }
