@@ -5,17 +5,21 @@
  * Compiler:  Arduino AVR (Proteus)
  */
 
+
 #include <Servo.h>
 
 #include <SPI.h>
 
+
 bool toggle;
 bool toggle2;
+
 
 Servo servo;
 Servo servo2;
 
 void setup () {
+
 
    // Using Timer/Counter3 for timer interrupt
    // Disable interrupts
@@ -45,7 +49,7 @@ void setup () {
    TIMSK3 |= 0x02;
    // Enable interrupts
    sei();
-
+  
    servo.attach(6);
    servo2.attach(9);
 
@@ -67,3 +71,4 @@ ISR(TIMER3_COMPA_vect){
    toggle = !toggle;
    digitalWrite(LED_BUILTIN, toggle);
 }
+

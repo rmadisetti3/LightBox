@@ -1,3 +1,4 @@
+
 /* Test the IO Expander + DAC, should output 440Hz sine wave
  *
  * Created:    Sat Oct 20, 2020
@@ -13,6 +14,7 @@ char outSPI;
 long sample = 0;
 
 void setup () {
+  
    pinMode(10, OUTPUT);
    SPI.begin();
    SPI.setBitOrder(MSBFIRST);
@@ -69,6 +71,7 @@ void setup () {
    TIMSK3 |= 0x02;
    // Enable interrupts
    sei();
+
 }
 
 void loop() {

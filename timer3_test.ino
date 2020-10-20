@@ -2,6 +2,7 @@
  * Description: This program uses the 16-bit Timer3
  * as an interrupt to flash the built in LED at 1Hz
  *
+
  * Created:    Sat Oct 20, 2020
  * Author:     Kenneth Adam Barnett
  * Board:      Arduino Pro Micro (ATMEGA32U4)
@@ -12,6 +13,7 @@
 bool toggle;
 
 void setup() {
+
    // Using Timer/Counter3 for timer interrupt
    // Disable interrupts
    cli();
@@ -50,4 +52,5 @@ ISR(TIMER3_COMPA_vect){
 
 void loop() {
   digitalWrite(LED_BUILTIN, toggle);
+
 }

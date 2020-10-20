@@ -1,3 +1,4 @@
+
 /* Test the IO Expander
  *
  * Created:    Sat Oct 20, 2020
@@ -8,10 +9,12 @@
 
 #include <SPI.h>
 
+
 char inSPI;
 char outSPI;
 
 void setup () {
+
    pinMode(10, OUTPUT);
    SPI.begin();
    SPI.setBitOrder(MSBFIRST);
@@ -39,6 +42,7 @@ void setup () {
    SPI.transfer(0x01);
    SPI.transfer(0x00);
    digitalWrite(10, HIGH);
+
    delay(100);
 
 }
