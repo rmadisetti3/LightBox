@@ -38,13 +38,16 @@ ezButton BTN6(15);
 ezButton BTN7(16);
 ezButton BTN8(17);
 Adafruit_MCP23017 mcp;
-Servo myServo;
+Servo myServo1;
+Servo myServo2;
 
 void peripheral_setup () {
   mcp.begin();      // use default address 0
   mcp.pinMode(0, OUTPUT);
-  myServo.attach(6);
-  myServo.write(0);
+  myServo1.attach(6);
+  myServo1.write(0);
+  myServo2.attach(7);
+  myServo2.write(0);
 }
 
 void peripheral_loop() {
@@ -166,7 +169,8 @@ l46:;
     }
 l59:;
     // Entry point to the idle state, reset servo to default position and stop playing any sounds
-    myServo.write(0);
+    myServo1.write(0);
+    myServo2.write(0);
     mcp.writeGPIOAB(0);
   }
 }
@@ -220,7 +224,8 @@ void chart_PlaySoundFromRec() {
 // Function that plays whatever tone is defined by the button status variable
 void chart_PlayTone() {
   // Move the servo according to the tone played.
-  myServo.write((var_ButtonStatus * 180) / 255);
+  myServo1.write((var_ButtonStatus * 180) / 255);
+  myServo2.write(180 - (var_ButtonStatus * 180) / 255);
   // Write the button input to te I/O expander to activate the buzzer that plays the tone
   mcp.writeGPIOAB(var_ButtonStatus);
   delay(500);
