@@ -9,7 +9,7 @@
 #pragma GCC push_options
 #pragma GCC optimize ("Os")
 
-#include <core.h> // Required by cpu
+//#include <core.h> // Required by cpu
 //#include <cpu.h>
 //#include <Generic.h>
 #include <Wire.h>
@@ -38,13 +38,13 @@ ezButton BTN6(15);
 ezButton BTN7(16);
 ezButton BTN8(17);
 Adafruit_MCP23017 mcp;
-Servo myservo;
+Servo myServo;
 
 void peripheral_setup () {
   mcp.begin();      // use default address 0
   mcp.pinMode(0, OUTPUT);
-  myservo.attach(6);
-  myservo.write(90);
+  myServo.attach(6);
+  myServo.write(0);
 }
 
 void peripheral_loop() {
@@ -95,30 +95,30 @@ void chart_SETUP() {
   chart_InitIO();
   // Entry point to the sculpture state machine
   while (var_main) {
-    while (!(SW1())) {
+    while (!(SW1.getState())) {
       delay(100);
       // This is how Proteus defaulted to doing an if/ else if/ else
       // Make sure to change this in the final software
-      if (!(SW2())) goto l17;
+      if (!(SW2.getState())) goto l17;
       // Entry point for Play Live state
       var_live = true;
       // Stay in Play live state until the switch is opened or rreset is tripped
-      while (var_live && !SW4()) {
+      while (var_live && !SW4.getState()) {
         // In Play Live mode, read the input and play the corresponding tone
         chart_ReadButtons();
         chart_PlayTone();
         // Trip the state back to idle if the switch is toggled
-        if (!(SW2() && !SW4())) {
+        if (!(SW2.getState() && !SW4.getState())) {
           var_live = false;
         }
       }
       goto l59;
 l17:;
       delay(100);
-      if (!(SW3())) goto l35;
+      if (!(SW3.getState())) goto l35;
       // Entry point for Record state
       var_record = true;
-      while (var_record && !SW4()) {
+      while (var_record && !SW4.getState()) {
         // Only record when there is room in the buffer
         if (var_SampleCount != 60) {
           // In record mode, read the button input, play the tone, and save the button input to the buffer
@@ -130,17 +130,17 @@ l17:;
           delay(500);
         }
         // Trip the state back to idle if the switch is toggled
-        if (!(SW3() && !SW4())) {
+        if (!(SW3.getState() && !SW4.getState())) {
           var_record = false;
         }
       }
       goto l59;
 l35:;
       delay(100);
-      if (!(SW4())) goto l46;
+      if (!(SW4.getState())) goto l46;
       // Entry point for the Reset state
       var_loop_count = 0, var_reset = true;
-      while (SW4()) {
+      while (SW4.getState()) {
         delay(100);
         // Sample the reset button once a millisecond, keeping a counter that resets whenever reset is released
         // If the counter isn't reset after 3 seconds, overwrite the recording by setting the write cursor back to zero
@@ -156,18 +156,18 @@ l46:;
     // Entry point for Play Recording state
     var_cur_samp_index = 0;
     var_play = true;
-    while (var_play && !SW4()) {
+    while (var_play && !SW4.getState()) {
       // Load in input from the play cursor loacation in the buffer and play the corresponding sound
       chart_PlaySoundFromRec();
       delay(500);
-      if (!(SW1() && !SW4())) {
+      if (!(SW1.getState() && !SW4.getState())) {
         var_play = false;
       }
     }
 l59:;
     // Entry point to the idle state, reset servo to default position and stop playing any sounds
-    M1.write(0);
-    IOX1.writeGPIO(0);
+    myServo.write(0);
+    mcp.writeGPIOAB(0);
   }
 }
 
@@ -175,28 +175,28 @@ l59:;
 // Each button is represented by a single bit.
 void chart_ReadButtons() {
   var_ButtonStatus = 0;
-  if (BTN1()) {
+  if (BTN1.getState()) {
     var_ButtonStatus = var_ButtonStatus + 1;
   }
-  if (BTN2()) {
+  if (BTN2.getState()) {
     var_ButtonStatus = var_ButtonStatus + 2;
   }
-  if (BTN3()) {
+  if (BTN3.getState()) {
     var_ButtonStatus = var_ButtonStatus + 4;
   }
-  if (BTN4()) {
+  if (BTN4.getState()) {
     var_ButtonStatus = var_ButtonStatus + 8;
   }
-  if (BTN5()) {
+  if (BTN5.getState()) {
     var_ButtonStatus = var_ButtonStatus + 16;
   }
-  if (BTN6()) {
+  if (BTN6.getState()) {
     var_ButtonStatus = var_ButtonStatus + 32;
   }
-  if (BTN7()) {
+  if (BTN7.getState()) {
     var_ButtonStatus = var_ButtonStatus + 64;
   }
-  if (BTN8()) {
+  if (BTN8.getState()) {
     var_ButtonStatus = var_ButtonStatus + 128;
   }
 }
@@ -220,16 +220,16 @@ void chart_PlaySoundFromRec() {
 // Function that plays whatever tone is defined by the button status variable
 void chart_PlayTone() {
   // Move the servo according to the tone played.
-  M1.write((var_ButtonStatus * 180) / 255);
+  myServo.write((var_ButtonStatus * 180) / 255);
   // Write the button input to te I/O expander to activate the buzzer that plays the tone
-  IOX1.writeGPIO(var_ButtonStatus);
+  mcp.writeGPIOAB(var_ButtonStatus);
   delay(500);
 }
 
 // Function to set all IO expander pins to outputs
 void chart_InitIO() {
   for (var_loop_count = 0; var_loop_count <= 8; var_loop_count += 1) {
-    IOX1.pinMode(var_loop_count, 1);
+    mcp.pinMode(var_loop_count, 1);
   }
 }
 
