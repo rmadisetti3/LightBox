@@ -9,15 +9,9 @@
 #pragma GCC push_options
 #pragma GCC optimize ("Os")
 
-//#include <core.h> // Required by cpu
-//#include <cpu.h>
-//#include <Generic.h>
 #include <Wire.h>
 #include "Adafruit_MCP23017.h"
-// #include <Adafruit_MCP23008.h> // Required by IOX1
-#include <Wire.h> // Required by IOX1
 #include <Servo.h> // Required by M1
-//#include <Generic/GenericServo.h>
 
 #include <ezButton.h>
 
@@ -29,41 +23,25 @@ ezButton SW1(1);
 ezButton SW2(2);
 ezButton SW3(3);
 ezButton SW4(4);
-ezButton BTN1(5);
-ezButton BTN2(7);
-ezButton BTN3(8);
-ezButton BTN4(9);
-ezButton BTN5(14);
-ezButton BTN6(15);
-ezButton BTN7(16);
-ezButton BTN8(17);
 Adafruit_MCP23017 mcp;
 Servo myServo1;
 Servo myServo2;
 
 void peripheral_setup () {
   mcp.begin();      // use default address 0
-  mcp.pinMode(0, OUTPUT);
+  mcp.pinMode(8, OUTPUT);
   myServo1.attach(6);
   myServo1.write(0);
   myServo2.attach(7);
   myServo2.write(0);
 }
 
-void peripheral_loop() {
-  SW1.loop();
-  SW2.loop();
-  SW3.loop();
-  SW4.loop();
-  BTN1.loop();
-  BTN2.loop();
-  BTN3.loop();
-  BTN4.loop();
-  BTN5.loop();
-  BTN6.loop();
-  BTN7.loop();
-  BTN8.loop();
-}
+// void peripheral_loop() {
+//   SW1.loop();
+//   SW2.loop();
+//   SW3.loop();
+//   SW4.loop();
+// }
 //---CONFIG_END---
 // Flowchart Variables
 
@@ -105,7 +83,7 @@ void chart_SETUP() {
       if (!(SW2.getState())) goto l17;
       // Entry point for Play Live state
       var_live = true;
-      // Stay in Play live state until the switch is opened or rreset is tripped
+      // Stay in Play live state until the switch is opened or reset is tripped
       while (var_live && !SW4.getState()) {
         // In Play Live mode, read the input and play the corresponding tone
         chart_ReadButtons();
@@ -179,28 +157,28 @@ l59:;
 // Each button is represented by a single bit.
 void chart_ReadButtons() {
   var_ButtonStatus = 0;
-  if (BTN1.getState()) {
+  if (mcp.digitalRead(0) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 1;
   }
-  if (BTN2.getState()) {
+  if (mcp.digitalRead(1) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 2;
   }
-  if (BTN3.getState()) {
+  if (mcp.digitalRead(2) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 4;
   }
-  if (BTN4.getState()) {
+  if (mcp.digitalRead(3) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 8;
   }
-  if (BTN5.getState()) {
+  if (mcp.digitalRead(4) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 16;
   }
-  if (BTN6.getState()) {
+  if (mcp.digitalRead(5) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 32;
   }
-  if (BTN7.getState()) {
+  if (mcp.digitalRead(6) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 64;
   }
-  if (BTN8.getState()) {
+  if (mcp.digitalRead(7) == LOW) {
     var_ButtonStatus = var_ButtonStatus + 128;
   }
 }
@@ -225,16 +203,16 @@ void chart_PlaySoundFromRec() {
 void chart_PlayTone() {
   // Move the servo according to the tone played.
   myServo1.write((var_ButtonStatus * 180) / 255);
-  myServo2.write(180 - (var_ButtonStatus * 180) / 255);
+  myServo2.write(360 - (var_ButtonStatus * 180) / 255);
   // Write the button input to te I/O expander to activate the buzzer that plays the tone
   mcp.writeGPIOAB(var_ButtonStatus);
   delay(500);
 }
 
-// Function to set all IO expander pins to outputs
+// Function to set all IO expander pins to inputs
 void chart_InitIO() {
-  for (var_loop_count = 0; var_loop_count <= 8; var_loop_count += 1) {
-    mcp.pinMode(var_loop_count, 1);
+  for (var_loop_count = 0; var_loop_count <= 8; var_loop_count++) {
+    mcp.pinMode(var_loop_count, INPUT);
   }
 }
 
@@ -244,5 +222,8 @@ void setup () {
   chart_SETUP();
 }
 void loop () {
-  peripheral_loop();
+  SW1.loop();
+  SW2.loop();
+  SW3.loop();
+  SW4.loop();
 }
