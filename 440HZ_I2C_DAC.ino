@@ -53,6 +53,7 @@ void loop() {
 ISR(TIMER1_COMPA_vect){
    // sin(2*pi*440/1024*n)
    outI2C = (uint16_t)(2047.5 + 2047.0 * sin(2.6998 * (double)sample));
+   interrupts();
    dac.setVoltage(outI2C, false);
    ++sample;
 }
