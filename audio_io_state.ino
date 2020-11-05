@@ -7,7 +7,7 @@
 */
 
 #include <SPI.h>
-#include <Servo.h> // Required by M1
+//#include <Servo.h> // Required by M1
 
 #define IDLE 0
 #define PLAYLIVE 1
@@ -36,19 +36,19 @@ unsigned int playCursor = 0;
 
 // Variables to store reset button and potentiometer readings
 bool reset = 0;
-int statePot = 300;
+int statePot;
 
-Servo myServo1;
-Servo myServo2;
+//Servo myServo1;
+//Servo myServo2;
 
 void setup () {
   pinMode(10, OUTPUT);
   SPI.begin();
   SPI.setBitOrder(MSBFIRST);
-  myServo1.attach(6);
-  myServo1.write(0);
-  myServo2.attach(9);
-  myServo2.write(0);
+  //myServo1.attach(6);
+  //myServo1.write(0);
+  //myServo2.attach(9);
+  //myServo2.write(0);
 
 
   // Enable Hardware addressing and disable sequential accessing
@@ -80,10 +80,10 @@ void setup () {
   // Disable interrupts
   cli();
   //Initialize the entire Timer/Counter Control Register A to 0
-  TCCR3A = 0;
+  TCCR1A = 0;
   // InitializeTimer/Counter Control B to the binary value:
   // '0000 1001'
-  TCCR3B = 0x09;
+  TCCR1B = 0x09;
   // This sets the timer to the following settings:
   // Waveform Generation Mode (WGM[3:0])
   // '0100'   -   Clear Timer on Compare (CTC)
@@ -91,22 +91,23 @@ void setup () {
   // '001'     -   16MHz Clock, not prescaled
 
   // Initialize Timer/Counter value to 0
-  TCNT3 = 0;
+  TCNT1 = 0;
 
   // Set Output Compare Register A to ensure 1024Hz
   // 16MHz/1024= 15625 Clock Edges per interrupt
   // Minus 1 because it executes on the next clock
-  OCR3A = 15624;
+  OCR1A = 15624;
   //  Set the Timer Interrupt Mask Register to mark
   // Output Compare A Match Interrupt Enable bit high
   // 'XXXX XX1X'
-  TIMSK3 |= 0x02;
+  TIMSK1 |= 0x02;
   // Enable interrupts
   sei();
 }
 
 void loop() {
   /// TODO: Read the state potentiometer and reset button from the correct pins here
+  statePot = analogRead(A1);
 
   if (reset) {
     // If Reset is pressed, return the state to idle and
@@ -142,11 +143,12 @@ void loop() {
       // for the motors here with delay timers. The function should
       // read button inputs stored in the inSPI variable and produce
       // a unique motor routine that takes roughly half a second
-      moveServos();
+      //moveServos();
       delay(500);
 
       /// TODO: Read the state potentiometer and reset button from the correct pins here
-
+      statePot = analogRead(A1);
+       
       // If the state has been changed or the reset button has been hit,
       // reset the state to idle to end the loop
       if (statePot < 256 || statePot > 512 || reset) {
@@ -156,8 +158,8 @@ void loop() {
         setTone();
 
         /// TODO: If the motors need to be reset to a default position, do so here.
-        myServo1.write(0);
-        myServo2.write(0);
+        //myServo1.write(0);
+        //myServo2.write(0);
       }
     }
 
@@ -177,7 +179,7 @@ void loop() {
         // for the motors here with delay timers. The function should
         // read button inputs stored in the inSPI variable and produce
         // a unique motor routine that takes roughly half a second
-        moveServos();
+        //moveServos();
         delay(500);
       }
       else {
@@ -186,7 +188,8 @@ void loop() {
       }
 
       /// TODO: Read the state potentiometer and reset button from the correct pins here
-
+      statePot = analogRead(A1);
+       
       // If the state has been changed or the reset button has been hit,
       // reset the state to idle to end the loop
       if (statePot < 512 || statePot > 768 || reset) {
@@ -196,8 +199,8 @@ void loop() {
         setTone();
 
         /// TODO: If the motors need to be reset to a default position, do so here.
-        myServo1.write(0);
-        myServo2.write(0);
+        //myServo1.write(0);
+        //myServo2.write(0);
       }
     }
   }
@@ -219,7 +222,8 @@ void loop() {
       delay(500);
 
       /// TODO: Read the state potentiometer and reset button from the correct pins here
-
+      statePot = analogRead(A1);
+       
       // If the state has been changed or the reset button has been hit,
       // reset the state to idle to end the loop
       if (statePot < 768 || reset) {
@@ -236,7 +240,7 @@ void loop() {
 
 }
 
-ISR(TIMER3_COMPA_vect) {
+ISR(TIMER1_COMPA_vect) {
   // sin(2*pi*f/1024*n)
   outSPI = (int)(127.5 + 127.0 * sin(omega[currentNote] * (double)sample));
   writeSPI();
@@ -290,8 +294,9 @@ void setTone() {
 
   currentNote = noteToSet;
 }
-
+/*
 void moveServos() {
     myServo1.write(((inSPI * 180) / 255));
     myServo2.write((360 - (inSPI * 180) / 255));
 }
+*/
