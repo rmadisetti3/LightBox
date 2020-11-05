@@ -7,8 +7,6 @@
 */
 
 #include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_MCP4725.h>
 #include <Servo.h> // Required by M1
 
 #define IDLE 0
@@ -37,9 +35,9 @@ unsigned int recCursor = 0;
 unsigned int playCursor = 0;
 
 // Variables to store reset button and potentiometer readings
-bool reset;
-int statePot;
-Adafruit_MCP4725 mcp;
+bool reset = 0;
+int statePot = 300;
+
 Servo myServo1;
 Servo myServo2;
 
@@ -51,7 +49,7 @@ void setup () {
   myServo1.write(0);
   myServo2.attach(9);
   myServo2.write(0);
-  mcp.begin();
+
 
   // Enable Hardware addressing and disable sequential accessing
 
@@ -240,7 +238,7 @@ void loop() {
 
 ISR(TIMER3_COMPA_vect) {
   // sin(2*pi*f/1024*n)
-  outSPI = (int)(0.5 + 170.0 * sin(omega[currentNote] * (double)sample));
+  outSPI = (int)(127.5 + 127.0 * sin(omega[currentNote] * (double)sample));
   writeSPI();
   ++sample;
 }
