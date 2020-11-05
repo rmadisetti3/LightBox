@@ -9,8 +9,8 @@
 
 #include <SPI.h>
 
-char inSPI;
-char outSPI;
+unsigned char inSPI;
+unsigned char outSPI;
 long sample = 0;
 
 void setup () {
@@ -79,7 +79,7 @@ void loop() {
 
 ISR(TIMER3_COMPA_vect){
    // sin(2*pi*440/1024*n)
-   outSPI = (int)(0.5+170.0*sin(2.6998*(double)sample));
+   outSPI = (unsigned char)(255.5+255.0*sin(2.6998*(double)sample));
    writeSPI();
    ++sample;
 }
