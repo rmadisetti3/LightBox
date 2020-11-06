@@ -243,7 +243,7 @@ ISR(TIMER1_COMPA_vect) {
   if (currentNote) {
       
       // Calculate the current sample
-      tSine += sin(omega[currentNote]);
+      tSine += omega[currentNote];
 
       // Anti-aliasing, keep tSine bounded by 2pi
       if(tSine >= 6.283185) {
